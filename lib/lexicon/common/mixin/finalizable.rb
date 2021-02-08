@@ -19,7 +19,7 @@ module Lexicon
         private
 
           def finalize
-            raise StandardError, "Finalizer is not implemented in #{self.class.name}"
+            raise StandardError.new("Finalizer is not implemented in #{self.class.name}")
           end
 
           def _finalize(_id)

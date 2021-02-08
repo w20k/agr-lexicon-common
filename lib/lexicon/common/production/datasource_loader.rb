@@ -28,7 +28,8 @@ module Lexicon
                       else
                         sets_by_name = package.file_sets.map { |fs| [fs.name, fs] }.to_h
 
-                        missing, present = only.map { |name| [name, sets_by_name.fetch(name, nil)] }.partition { |(_name, value)| value.nil? }
+                        missing, present = only.map { |name| [name, sets_by_name.fetch(name, nil)] }
+                                               .partition { |(_name, value)| value.nil? }
 
                         if missing.any?
                           puts "[ NOK ] Datasources #{missing.map(&:first).join(', ')} don't exist!"
@@ -56,55 +57,55 @@ module Lexicon
 
         private
 
-        # @return [Database::Factory]
-        attr_reader :database_factory
-        # @return [ShellExecutor]
-        attr_reader :shell
-        # @return [FileLoader]
-        attr_reader :file_loader
-        # @return [String]
-        attr_reader :database_url
+          # @return [Database::Factory]
+          attr_reader :database_factory
+          # @return [ShellExecutor]
+          attr_reader :shell
+          # @return [FileLoader]
+          attr_reader :file_loader
+          # @return [String]
+          attr_reader :database_url
 
-        def load_structure_files(files, schema:)
-          database = database_factory.new_instance(url: database_url)
-          database.prepend_search_path(schema) do
-            files.each do |file|
-              database.query(file.read)
+          def load_structure_files(files, schema:)
+            database = database_factory.new_instance(url: database_url)
+            database.prepend_search_path(schema) do
+              files.each do |file|
+                database.query(file.read)
+              end
             end
           end
-        end
 
-        # @param [Package::Package] package
-        def lock_tables(package)
-          database = database_factory.new_instance(url: database_url)
+          # @param [Package::Package] package
+          def lock_tables(package)
+            database = database_factory.new_instance(url: database_url)
 
-          schema = version_to_schema(package.version)
+            schema = version_to_schema(package.version)
 
-          database.prepend_search_path schema do
-            database.query <<~SQL
-              CREATE OR REPLACE FUNCTION #{schema}.deny_changes()
-                RETURNS TRIGGER
-              AS $$
-                BEGIN
-                  RAISE EXCEPTION '% denied on % (master data)', TG_OP, TG_RELNAME;
-                END;
-              $$
-              LANGUAGE plpgsql;
-            SQL
-            package.file_sets.flat_map(&:tables).each do |table_name|
+            database.prepend_search_path schema do
               database.query <<~SQL
-                CREATE TRIGGER deny_changes
-                  BEFORE INSERT
-                      OR UPDATE
-                      OR DELETE
-                      OR TRUNCATE
-                  ON #{schema}.#{table_name}
-                  FOR EACH STATEMENT
-                    EXECUTE PROCEDURE #{schema}.deny_changes()
+                CREATE OR REPLACE FUNCTION #{schema}.deny_changes()
+                  RETURNS TRIGGER
+                AS $$
+                  BEGIN
+                    RAISE EXCEPTION '% denied on % (master data)', TG_OP, TG_RELNAME;
+                  END;
+                $$
+                LANGUAGE plpgsql;
               SQL
+              package.file_sets.flat_map(&:tables).each do |table_name|
+                database.query <<~SQL
+                  CREATE TRIGGER deny_changes
+                    BEFORE INSERT
+                        OR UPDATE
+                        OR DELETE
+                        OR TRUNCATE
+                    ON #{schema}.#{table_name}
+                    FOR EACH STATEMENT
+                      EXECUTE PROCEDURE #{schema}.deny_changes()
+                SQL
+              end
             end
           end
-        end
       end
     end
   end

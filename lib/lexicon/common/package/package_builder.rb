@@ -5,7 +5,13 @@ module Lexicon
     module Package
       class PackageBuilder < Package
         def initialize(version:, dir:)
-          super(file_sets: [], version: version, dir: dir, checksum_file: dir.join(CHECKSUM_FILE_NAME), spec_file: dir.join(SPEC_FILE_NAME))
+          super(
+            file_sets: [],
+            version: version,
+            dir: dir,
+            checksum_file: dir.join(CHECKSUM_FILE_NAME),
+            spec_file: dir.join(SPEC_FILE_NAME)
+          )
 
           FileUtils.mkdir_p(data_dir)
         end
@@ -34,7 +40,13 @@ module Lexicon
                         dname
                       end
 
-          file_sets << SourceFileSet.new(id: id, name: name, structure: structure_file_name(id), data: data.nil? ? nil : data_name, tables: tables)
+          file_sets << SourceFileSet.new(
+            id: id,
+            name: name,
+            structure: structure_file_name(id),
+            data: data.nil? ? nil : data_name,
+            tables: tables
+          )
         end
 
         def as_package

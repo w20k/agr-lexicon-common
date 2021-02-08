@@ -1,41 +1,10 @@
+inherit_from: https://gitlab.com/ekylibre/tools/rubocop/-/raw/0.1.0/.rubocop.yml
+
 AllCops:
+  TargetRubyVersion: 2.6
   Exclude:
-    - 'lib/datasources/**/*'
+    - 'bin/**/*'
 
-Metrics:
-  Enabled: false
-
-Layout/BlockAlignment:
-  EnforcedStyle: start_of_block
-
-Layout/IndentationConsistency:
-  EnforcedStyle: indented_internal_methods
-
-#Layout/MultilineMethodCallIndentation:
-#  EnforcedStyle: indented_relative_to_receiver
-
-Style/SymbolArray:
-  EnforcedStyle: percent
-
-Layout/LineLength:
-  AutoCorrect: false
-  Max: 140
-
-Style/IfUnlessModifier:
-  Enabled: false
-
-Style/EmptyElse:
-  Enabled: false
-
-Style/DoubleNegation:
-  Enabled: false
-
-Style/Documentation:
-  Enabled: false
-
-Style/NegatedIf:
-  Enabled: false
-
-Bundler/OrderedGems:
-  Enabled: false
-
+Naming/FileName:
+  Exclude:
+    - 'lib/lexicon-common.rb'

@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://lexicon.ekylibre.dev/lexicon.schema.json",
+  "title": "Lexicon Package JSON Schema",
+  "description": "",
+  "type": "object",
+  "properties": {
+    "version": {
+      "description": "The version of the packaged version",
+      "type": "string",
+      "$comment": "Regex is from https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-((?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\\.(?:0|[1-9]\\d*|\\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\\+([0-9a-zA-Z-]+(?:\\.[0-9a-zA-Z-]+)*))?$"
+    },
+    "content": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z][a-z_]*$": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "structure": {
+              "type": "string"
+            },
+            "data": {
+              "type": "string"
+            },
+            "tables": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "additionalItems": false
+            }
+          },
+          "required": [
+            "name",
+            "structure",
+            "tables"
+          ]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "version",
+    "content"
+  ]
+}

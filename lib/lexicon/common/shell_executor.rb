@@ -15,7 +15,7 @@ module Lexicon
       def execute(command)
         log(command.cyan)
 
-        cmd = Tempfile.new("command-", @command_dir)
+        cmd = Tempfile.new('command-', @command_dir)
         cmd.write <<~BASH
           #!/usr/bin/env bash
           set -e

@@ -31,8 +31,6 @@ module Lexicon
           false
         end
 
-        private
-
       end
     end
   end

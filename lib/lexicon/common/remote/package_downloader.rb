@@ -22,8 +22,16 @@ module Lexicon
             Dir.mktmpdir(nil, out_dir) do |tmp_dir|
               tmp_dir = Pathname.new(tmp_dir)
 
-              s3.get_object(bucket: bucket, key: Package::SPEC_FILE_NAME, response_target: tmp_dir.join(Package::SPEC_FILE_NAME).to_s)
-              s3.get_object(bucket: bucket, key: Package::CHECKSUM_FILE_NAME, response_target: tmp_dir.join(Package::CHECKSUM_FILE_NAME).to_s)
+              s3.get_object(
+                bucket: bucket,
+                key: Package::SPEC_FILE_NAME,
+                response_target: tmp_dir.join(Package::SPEC_FILE_NAME).to_s
+              )
+              s3.get_object(
+                bucket: bucket,
+                key: Package::CHECKSUM_FILE_NAME,
+                response_target: tmp_dir.join(Package::CHECKSUM_FILE_NAME).to_s
+              )
 
               package = package_loader.load_package(tmp_dir.basename.to_s)
               if !package.nil?
@@ -66,10 +74,10 @@ module Lexicon
 
         private
 
-        # @return [DirectoryPackageLoader]
-        attr_reader :package_loader
-        # @return [Pathname]
-        attr_reader :out_dir
+          # @return [DirectoryPackageLoader]
+          attr_reader :package_loader
+          # @return [Pathname]
+          attr_reader :out_dir
       end
     end
   end

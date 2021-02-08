@@ -1,0 +1,35 @@
+include:
+  - project: ekylibre/tools/pipeline-utilities
+    ref: 1.0.0
+    file: /rubygems/rubygems.yaml
+
+stages:
+  - lint
+  - test
+  - release
+
+rubocop:
+  stage: lint
+  image: registry.gitlab.com/ekylibre/tools/rubocop/rubocop:0.1.0
+  variables:
+    GIT_DEPTH: 1
+  script:
+    - rubocop --parallel
+
+test:
+  image: registry.gitlab.com/ekylibre/docker-base-images/ruby2.6:1
+  before_script:
+    - gem install bundler
+    - bundle install --path vendor/bundle
+  cache:
+    key: bundle
+    paths:
+      - vendor/bundle
+  script:
+    - bundle exec rake test
+
+rubygems:
+  extends: .rubygems-automatic
+  stage: release
+  variables:
+    GEMSPEC: lexicon-common

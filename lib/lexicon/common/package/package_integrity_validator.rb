@@ -29,8 +29,8 @@ module Lexicon
 
         protected
 
-        # @return [ShellExecutor]
-        attr_reader :shell
+          # @return [ShellExecutor]
+          attr_reader :shell
       end
     end
   end

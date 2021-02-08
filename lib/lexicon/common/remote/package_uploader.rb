@@ -41,17 +41,17 @@ module Lexicon
 
         private
 
-        # @param [Array<Pathname>] files
-        #
-        # @yieldparam [Pathname] path
-        def upload_files(*files, bucket:, prefix: nil)
-          files.each do |path|
-            path.open do |f|
-              s3.put_object(bucket: bucket, key: [prefix, path.basename.to_s].compact.join('/'), body: f)
+          # @param [Array<Pathname>] files
+          #
+          # @yieldparam [Pathname] path
+          def upload_files(*files, bucket:, prefix: nil)
+            files.each do |path|
+              path.open do |f|
+                s3.put_object(bucket: bucket, key: [prefix, path.basename.to_s].compact.join('/'), body: f)
+              end
+              yield path if block_given?
             end
-            yield path if block_given?
           end
-        end
       end
     end
   end

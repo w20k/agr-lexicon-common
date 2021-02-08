@@ -8,3 +8,6 @@
 /tmp/
 
 Gemfile.lock
+
+# Remote rubocop configurations
+/.rubocop-*

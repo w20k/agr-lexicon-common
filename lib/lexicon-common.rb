@@ -4,13 +4,13 @@
 require 'aws-sdk-s3'
 require 'colored'
 require 'logger'
+require 'json_schemer'
 require 'pg'
 require 'semantic'
 require 'zeitwerk'
 
-# Make sure the Lexicon module already exists so that Zeitwerk does not manage it
-module Lexicon
-end
+# Require the common file as loading the version first through the gemspec prevents Zeitwerk to load it.
+require_relative 'lexicon/common'
 
 loader = Zeitwerk::Loader.for_gem
 loader.ignore(__FILE__)
