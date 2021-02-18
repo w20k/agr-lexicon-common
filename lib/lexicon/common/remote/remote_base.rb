@@ -11,7 +11,7 @@ module Lexicon
 
         private
 
-          # @return [Aws::S3::Client]
+          # @return [S3Client]
           attr_reader :s3
       end
     end

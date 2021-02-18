@@ -22,15 +22,15 @@ module Lexicon
             Dir.mktmpdir(nil, out_dir) do |tmp_dir|
               tmp_dir = Pathname.new(tmp_dir)
 
-              s3.get_object(
+              s3.raw.get_object(
                 bucket: bucket,
-                key: Package::SPEC_FILE_NAME,
-                response_target: tmp_dir.join(Package::SPEC_FILE_NAME).to_s
+                key: Package::Package::SPEC_FILE_NAME,
+                response_target: tmp_dir.join(Package::Package::SPEC_FILE_NAME).to_s
               )
-              s3.get_object(
+              s3.raw.get_object(
                 bucket: bucket,
-                key: Package::CHECKSUM_FILE_NAME,
-                response_target: tmp_dir.join(Package::CHECKSUM_FILE_NAME).to_s
+                key: Package::Package::CHECKSUM_FILE_NAME,
+                response_target: tmp_dir.join(Package::Package::CHECKSUM_FILE_NAME).to_s
               )
 
               package = package_loader.load_package(tmp_dir.basename.to_s)
@@ -41,7 +41,7 @@ module Lexicon
 
                 package.structure_files.map do |file|
                   Thread.new do
-                    s3.get_object(bucket: bucket, key: "data/#{file.basename.to_s}", response_target: file.to_s)
+                    s3.raw.get_object(bucket: bucket, key: "data/#{file.basename.to_s}", response_target: file.to_s)
                     puts "[  OK ] Downloaded #{file.basename}".green
                   end
                 end.each(&:join)
@@ -49,7 +49,7 @@ module Lexicon
                 package.file_sets.map do |fs|
                   Thread.new do
                     path = package.data_path(fs)
-                    s3.get_object(bucket: bucket, key: "data/#{path.basename.to_s}", response_target: path.to_s)
+                    s3.raw.get_object(bucket: bucket, key: "data/#{path.basename.to_s}", response_target: path.to_s)
                     puts "[  OK ] Downloaded #{path.basename}".green
                   end
                 end.each(&:join)
