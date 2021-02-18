@@ -4,11 +4,12 @@ module Lexicon
   module Common
     module Mixin
       module LoggerAware
+        # @return [Logger]
         attr_accessor :logger
 
         def log(*args, **options)
           if !logger.nil?
-            logger.log(*args, **options)
+            logger.debug(*args, **options)
           end
         end
 
