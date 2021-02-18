@@ -7,7 +7,7 @@ module Lexicon
             alias_method :_new, :new
 
             def new(*args, **options)
-              e = _new(*args, **options)
+              e = do_call(self, '_new', args, options)
 
               ObjectSpace.define_finalizer(e, e.method(:_finalize))
 
@@ -17,6 +17,26 @@ module Lexicon
         end
 
         private
+
+          # Empty Array and Hash splats are handled correctly starting ruby 2.7:
+          # if both args and kwargs are empty, no parameters are sent.
+          if ::Semantic::Version.new(RUBY_VERSION).satisfies?('>= 2.7.0')
+            def do_call(obj, method, args, kwargs)
+              obj.send(method, *args, **kwargs)
+            end
+          else
+            def do_call(obj, method, args, kwargs)
+              if args.empty? && kwargs.empty?
+                obj.send(method)
+              elsif args.empty?
+                obj.send(method, **kwargs)
+              elsif kwargs.empty?
+                obj.send(method, *args)
+              else
+                obj.send(method, *args, **kwargs)
+              end
+            end
+          end
 
           def finalize
             raise StandardError.new("Finalizer is not implemented in #{self.class.name}")
