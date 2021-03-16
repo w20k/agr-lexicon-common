@@ -8,7 +8,7 @@ Gem::Specification.new do |spec|
   spec.authors = ['Ekylibre developers']
   spec.email = ['dev@ekylibre.com']
 
-  spec.summary = 'Common classes and services for the Lexicon'
+  spec.summary = "Common classes and services for Ekylibre's Lexicon"
   spec.required_ruby_version = '>= 2.6.0'
   spec.homepage = 'https://www.ekylibre.com'
   spec.license = 'AGPL-3.0-only'
@@ -28,5 +28,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency 'bundler', '~> 2.0'
   spec.add_development_dependency 'minitest', '~> 5.14'
   spec.add_development_dependency 'rake', '~> 13.0'
-  spec.add_development_dependency 'rubocop', '~> 1.3.1'
+  spec.add_development_dependency 'rubocop', '1.11.0'
 end

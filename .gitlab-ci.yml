@@ -10,9 +10,7 @@ stages:
 
 rubocop:
   stage: lint
-  image: registry.gitlab.com/ekylibre/tools/rubocop/rubocop:0.1.0
-  variables:
-    GIT_DEPTH: 1
+  image: registry.gitlab.com/ekylibre/tools/rubocop/rubocop:0.2.0
   script:
     - rubocop --parallel
 
@@ -26,7 +24,7 @@ test:
     paths:
       - vendor/bundle
   script:
-    - bundle exec rake test
+    - bin/rake test
 
 rubygems:
   extends: .rubygems-automatic
