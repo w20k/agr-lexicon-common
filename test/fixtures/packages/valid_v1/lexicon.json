@@ -1,0 +1,24 @@
+{
+  "version": "4.1.5",
+  "content": {
+    "technical_workflow_sequences": {
+      "name": "technical_workflow_sequences",
+      "structure": "technical_workflow_sequences__structure.sql",
+      "tables": [
+        "technical_workflow_sequences"
+      ]
+    },
+    "ephy": {
+      "name": "ephy",
+      "structure": "ephy__structure.sql",
+      "tables": [
+        "registered_phytosanitary_cropsets",
+        "registered_phytosanitary_products",
+        "registered_phytosanitary_usages",
+        "registered_phytosanitary_risks",
+        "registered_phytosanitary_symbols",
+        "registered_phytosanitary_target_name_to_pfi_targets"
+      ]
+    }
+  }
+}

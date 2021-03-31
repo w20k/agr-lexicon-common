@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+using Corindon::Result::Ext
+
 module Lexicon
   module Common
     module Remote
@@ -7,50 +9,57 @@ module Lexicon
         include Mixin::LoggerAware
 
         # @param [Package] package
-        # @return [Boolean]
+        # @return [Corindon::Result::Result]
         def upload(package)
-          bucket_name = package.version.to_s
-          if !s3.bucket_exist?(bucket_name)
-            s3.create_bucket(bucket: bucket_name)
-            puts 'Uploading structures...'
+          rescue_failure do
+            bucket_name = package.version.to_s
 
-            upload_files(*package.structure_files, bucket: bucket_name, prefix: 'data')
-            puts '[  OK ] Structure uploaded.'.green
-
-            data_files = package.file_sets
-                                .select(&:data_path)
-                                .map { |fs| package.data_path(fs) }
-
-            upload_files(*data_files, bucket: bucket_name, prefix: 'data') do |path|
-              puts "[  OK ] #{path.basename}".green
+            if s3.bucket_exist?(bucket_name)
+              Failure(StandardError.new("The server already has a folder named #{bucket_name}"))
+            else
+              upload_package(package, bucket_name)
             end
-
-            upload_files(package.checksum_file, package.spec_file, bucket: bucket_name) do |path|
-              puts "[  OK ] #{path.basename}".green
-            end
-
-            true
-          else
-            false
           end
-        rescue StandardError => e
-          log_error(e)
-
-          false
         end
 
         private
 
+          # @return [Corindon::Result::Result]
+          def upload_package(package, bucket_name)
+            s3.raw.create_bucket(bucket: bucket_name)
+
+            relative_paths = [*base_files, *package.files.map(&:path)]
+
+            upload_files(*relative_paths, from: package.dir, bucket: bucket_name) do |path|
+              puts "[  OK ] #{path.basename}".green
+            end
+
+            Success(package)
+          rescue StandardError => e
+            s3.ensure_bucket_absent(bucket_name)
+
+            Failure(e)
+          end
+
           # @param [Array<Pathname>] files
-          #
+          # @param [Pathname] from
           # @yieldparam [Pathname] path
-          def upload_files(*files, bucket:, prefix: nil)
+          def upload_files(*files, bucket:, from:)
             files.each do |path|
-              path.open do |f|
-                s3.put_object(bucket: bucket, key: [prefix, path.basename.to_s].compact.join('/'), body: f)
+              from.join(path).open do |f|
+                s3.raw.put_object(bucket: bucket, key: path.to_s, body: f)
               end
+
               yield path if block_given?
             end
+          end
+
+          # @return [Array<Pathname>]
+          def base_files
+            [
+              Pathname.new(Package::Package::CHECKSUM_FILE_NAME),
+              Pathname.new(Package::Package::SPEC_FILE_NAME),
+            ]
           end
       end
     end

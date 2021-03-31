@@ -4,7 +4,6 @@ module Lexicon
   module Common
     class ShellExecutor
       include Mixin::Finalizable
-      include Mixin::LoggerAware
 
       def initialize
         @command_dir = Dir.mktmpdir
@@ -13,8 +12,6 @@ module Lexicon
       # @param [String] command
       # @return [String]
       def execute(command)
-        log(command.cyan)
-
         cmd = Tempfile.new('command-', @command_dir)
         cmd.write <<~BASH
           #!/usr/bin/env bash

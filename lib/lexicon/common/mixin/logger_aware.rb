@@ -16,8 +16,8 @@ module Lexicon
         def log_error(error)
           if error.nil?
             log('Error (nil)')
-          else
-            log([error.message, *error.backtrace].join("\n"))
+          elsif !logger.nil?
+            logger.error([error.message, *error.backtrace].join("\n"))
           end
         end
       end

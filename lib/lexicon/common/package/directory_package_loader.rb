@@ -17,7 +17,7 @@ module Lexicon
         end
 
         # @param [String] name
-        # @return [Package, nil]
+        # @return [Package::Package, nil]
         def load_package(name)
           package_dir = root_dir.join(name.to_s)
 
@@ -40,18 +40,17 @@ module Lexicon
               json = JSON.parse(spec_file.read)
 
               if @schema_validator.valid?(json)
-                version = Semantic::Version.new(json.fetch('version'))
-                file_sets = json.fetch('content').map do |id, values|
-                  SourceFileSet.new(
-                    id: id,
-                    name: values.fetch('name'),
-                    structure: values.fetch('structure'),
-                    data: values.fetch('data', nil),
-                    tables: values.fetch('tables', [])
-                  )
-                end
+                package_version = json.fetch('schema_version', 1)
+                case package_version
+                when 1
+                  load_v1(dir: dir, spec_file: spec_file, checksum_file: checksum_file, json: json)
+                when 2
+                  load_v2(dir: dir, spec_file: spec_file, checksum_file: checksum_file, json: json)
+                else
+                  log("Package version #{package_version} is not supported")
 
-                Package.new(file_sets: file_sets, version: version, dir: dir, checksum_file: checksum_file, spec_file: spec_file)
+                  nil
+                end
               else
                 log("Package at path #{dir} has invalid manifest")
 
@@ -60,6 +59,51 @@ module Lexicon
             else
               nil
             end
+          end
+
+          # @param [Pathname] checksum_file
+          # @param [Pathname] dir
+          # @param [Hash] json
+          # @param [Pathname] spec_file
+          # @return [V1::Package]
+          def load_v1(dir:, spec_file:, checksum_file:, json:)
+            version = Semantic::Version.new(json.fetch('version'))
+            file_sets = json.fetch('content').map do |id, values|
+              V1::SourceFileSet.new(
+                id: id,
+                name: values.fetch('name'),
+                structure: values.fetch('structure'),
+                data: values.fetch('data', nil),
+                tables: values.fetch('tables', [])
+              )
+            end
+
+            V1::Package.new(file_sets: file_sets, version: version, dir: dir, checksum_file: checksum_file, spec_file: spec_file)
+          end
+
+          # @param [Pathname] checksum_file
+          # @param [Pathname] dir
+          # @param [Hash] json
+          # @param [Pathname] spec_file
+          # @return [V2::Package]
+          def load_v2(dir:, spec_file:, checksum_file:, json:)
+            version = Semantic::Version.new(json.fetch('version'))
+            file_sets = json.fetch('content').map do |id, values|
+              V2::SourceFileSet.new(
+                id: id,
+                name: values.fetch('name'),
+                structure: values.fetch('structure'),
+                tables: values.fetch('tables', {})
+              )
+            end
+
+            V2::Package.new(
+              file_sets: file_sets,
+              version: version,
+              dir: dir,
+              checksum_file: checksum_file,
+              spec_file: spec_file
+            )
           end
       end
     end

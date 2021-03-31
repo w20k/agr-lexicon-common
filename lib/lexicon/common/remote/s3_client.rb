@@ -31,6 +31,12 @@ module Lexicon
           false
         end
 
+        # @param [String] name
+        def ensure_bucket_absent(name)
+          if bucket_exist?(name)
+            raw.delete_bucket(bucket: name)
+          end
+        end
       end
     end
   end

@@ -9,7 +9,7 @@ module Lexicon
           @schema_path = schema_path
         end
 
-        # @return [JSONSchemer::Schema]
+        # @return [JSONSchemer::Schema::Base]
         def build
           JSONSchemer.schema(schema_path)
         end
