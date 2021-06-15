@@ -50,7 +50,7 @@ module Lexicon
           drop_schema(schema, cascade: true)
         end
 
-        def drop_schema(name, cascade: false)
+        def drop_schema(name, cascade: false, if_exists: false)
           cascade = if cascade
                       ' CASCADE'
                     else
@@ -58,7 +58,7 @@ module Lexicon
                     end
 
           query <<~SQL
-            DROP SCHEMA "#{name}"#{cascade};
+            DROP SCHEMA #{if_exists ? "IF EXISTS " : ""}"#{name}"#{cascade};
           SQL
         end
 
@@ -93,6 +93,28 @@ module Lexicon
         def copy_data(sql, &block)
           put_data = ->(d) { @connection.put_copy_data(d) }
           @connection.copy_data(sql) { block.call(put_data) }
+        end
+
+        # @param [#to_s] table
+        # @param [#to_s | nil] schema
+        # @return [Boolean]
+        def table_exists?(table, schema: nil)
+          schema = search_path.first if schema.nil?
+
+          query(<<~SQL, table, schema).any?
+            SELECT table_name FROM information_schema.tables
+            WHERE table_name = $1 AND table_schema = $2
+          SQL
+        end
+
+        # @param [#to_s] schema_name
+        # @return [Boolean]
+        def schema_exists?(schema_name)
+          query(<<~SQL, schema_name).count > 0
+            SELECT "schema_name"
+            FROM "information_schema"."schemata"
+            WHERE "schema_name" = $1
+          SQL
         end
 
         private
