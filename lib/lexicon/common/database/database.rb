@@ -58,7 +58,7 @@ module Lexicon
                     end
 
           query <<~SQL
-            DROP SCHEMA #{if_exists ? "IF EXISTS " : ""}"#{name}"#{cascade};
+            DROP SCHEMA #{if_exists ? 'IF EXISTS ' : ''}"#{name}"#{cascade};
           SQL
         end
 

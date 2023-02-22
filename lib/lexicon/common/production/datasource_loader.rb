@@ -153,7 +153,7 @@ module Lexicon
           # @param [String] schema
           def load_csv(file, into:, schema:)
             psql.execute_raw(<<~SQL)
-              \\copy "#{schema}"."#{into}" FROM PROGRAM 'zcat #{file}' WITH csv
+              \\copy "#{schema}"."#{into}" FROM PROGRAM 'zcat < #{file}' WITH csv
             SQL
           end
 
