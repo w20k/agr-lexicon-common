@@ -4,7 +4,7 @@ require_relative 'lib/lexicon/common/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'lexicon-common'
-  spec.version = Lexicon::Common::VERSION
+  spec.version = Lexicon::Common::Version
   spec.authors = ['Ekylibre developers']
   spec.email = ['dev@ekylibre.com']
 
@@ -27,8 +27,10 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'semantic', '~> 1.6'
   spec.add_dependency 'zeitwerk', '~> 2.4'
 
-  spec.add_development_dependency 'bundler', '~> 2.0'
+  spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'minitest', '~> 5.14'
   spec.add_development_dependency 'rake', '~> 13.0'
   spec.add_development_dependency 'rubocop', '1.11.0'
+
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
